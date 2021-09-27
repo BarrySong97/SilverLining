@@ -1,0 +1,13 @@
+{
+  "miniprogramRoot": "./",
+  "projectname": "silver-lining",
+  "description": "last day of work. celebrating the holiday!",
+  "appid": "touristappid",
+  "setting": {
+    "urlCheck": true,
+    "es6": false,
+    "postcss": false,
+    "minified": false
+  },
+  "compileType": "miniprogram"
+}
