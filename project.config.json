@@ -2,9 +2,9 @@
     "miniprogramRoot": "dist/",
     "projectname": "silver-lining",
     "description": "last day of work. celebrating the holiday!",
-    "appid": "wx3ddb1bdd08437237",
+    "appid": "wxf6d2bbd0baa942b6",
     "setting": {
-        "urlCheck": false,
+        "urlCheck": true,
         "es6": false,
         "enhance": true,
         "postcss": false,

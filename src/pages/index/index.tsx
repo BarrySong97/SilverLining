@@ -2,10 +2,17 @@
 import Taro, { useReady } from "@tarojs/taro";
 import React, { FC, useEffect, useState } from "react";
 import { View, Text, Image } from "@tarojs/components";
-import { AtCountdown, AtDivider, AtButton } from "taro-ui";
+import {
+  AtCountdown,
+  AtButton,
+  AtActionSheet,
+  AtActionSheetItem,
+  AtNoticebar
+} from "taro-ui";
 // import moment from "moment";
 // import "taro-ui/dist/style/components/button.scss"; // 按需引入
 import "./index.less";
+import { getDayOfYear } from "../../../util/date";
 
 export interface Holiday {
   year: number;
@@ -59,19 +66,14 @@ const holidatImags = {
 };
 const now = new Date();
 const year = now.getFullYear();
-const getDayOfYear = (date: Date) =>
-  Math.floor(
-    (date.getTime() - new Date(date.getFullYear(), 0, 0).getTime()) /
-      1000 /
-      60 /
-      60 /
-      24
-  );
+
 const url = `https://api.apihubs.cn/holiday/get?holiday_recess=1&cn=1&year=${year}&holiday_today=1`;
 const Index: FC = () => {
   const [holidays, setHolidays] = useState<Holiday[]>([]);
   const [recentHoliday, setRecentHoliday] = useState<Holiday>();
   const [last, setLast] = useState<LastDate>();
+
+  const [bottomSheetVisible, setBottomSheetVisible] = useState<boolean>(false);
   useReady(() => {
     Taro.request({
       url: url, //仅为示例，并非真实的接口地址
@@ -86,14 +88,6 @@ const Index: FC = () => {
     });
   });
 
-  function dateDiffInDays(a, b) {
-    // Discard the time and time-zone information.
-    const _MS_PER_DAY = 1000 * 60 * 60 * 24;
-    const utc1 = Date.UTC(a.getFullYear(), a.getMonth(), a.getDate());
-    const utc2 = Date.UTC(b.getFullYear(), b.getMonth(), b.getDate());
-
-    return Math.floor((utc2 - utc1) / _MS_PER_DAY);
-  }
   const getRecentHolidayDate = () => {
     const dayOfYear = getDayOfYear(new Date());
     if (holidays.length) {
@@ -106,7 +100,6 @@ const Index: FC = () => {
         }
       });
       setRecentHoliday(recent);
-      now.getMinutes();
       let subtract = {
         day: Math.floor((min * 24 - now.getHours()) / 24),
         hours: ((min * 24 - now.getHours()) % 24) - 1,
@@ -125,10 +118,18 @@ const Index: FC = () => {
 
   return (
     <View className="index col">
-      <Image
-        style={{ width: 320, height: 240 }}
-        src="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fp5.img.cctvpic.com%2FphotoAlbum%2Fpage%2Fperformance%2Fimg%2F2013%2F10%2F1%2F1380611667865_62.jpg&refer=http%3A%2F%2Fp5.img.cctvpic.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1635314630&t=5b4ba8fe6247950042c0b99482c5096e"
-      />
+      <View className="info">
+        <AtNoticebar marquee>
+          {last && `还有${last.day}天就放假了，请大家努力摸鱼，坚持就是胜利！`}
+        </AtNoticebar>
+      </View>
+      <View className="at-row at-row__justify--center mt-2 mb-2">
+        <Image
+          style={{ width: 320, height: 200 }}
+          src="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fp5.img.cctvpic.com%2FphotoAlbum%2Fpage%2Fperformance%2Fimg%2F2013%2F10%2F1%2F1380611667865_62.jpg&refer=http%3A%2F%2Fp5.img.cctvpic.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1635314630&t=5b4ba8fe6247950042c0b99482c5096e"
+        />
+      </View>
+
       <View className="at-row at-row__justify--center mt-2 mb-2">
         <Text>
           距离
@@ -150,8 +151,29 @@ const Index: FC = () => {
           />
         )}
       </View>
+
+      <View className="at-row at-row__justify--center mt-2">
+        <AtButton type="primary" onClick={() => setBottomSheetVisible(true)}>
+          别点
+        </AtButton>
+      </View>
+
+      <AtActionSheet
+        onClose={() => setBottomSheetVisible(false)}
+        isOpened={bottomSheetVisible}
+      >
+        <AtActionSheetItem
+          onClick={() => {
+            Taro.navigateTo({
+              url: "/pages/life-progress/index"
+            });
+          }}
+        >
+          人生进度条
+        </AtActionSheetItem>
+      </AtActionSheet>
     </View>
   );
 };
-
+export { getDayOfYear };
 export default Index;
